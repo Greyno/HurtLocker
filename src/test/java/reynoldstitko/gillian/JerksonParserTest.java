@@ -4,6 +4,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import static junit.framework.Assert.assertSame;
 import static junit.framework.TestCase.assertEquals;
@@ -111,6 +114,80 @@ public class JerksonParserTest {
         expected.add("Apples 0.23");
         expected.add("Bread 2.25");
         ArrayList<GroceryItem> actual = jerksonParser.combineItemsAndPrices(inputItems, inputPrices);
+    }
+
+    @Test(expected = StringMismatchException.class)
+    public void removeNullItemsFromArrayTest() throws StringMismatchException{
+        ArrayList<String> inputPrices = new ArrayList<>();
+        inputPrices.add("3.23");
+        //inputPrices.add("null");
+        inputPrices.add("0.23");
+        inputPrices.add("2.25");
+        ArrayList<String> expected = new ArrayList<>();
+        expected.add("3.23");
+        expected.add("0.23");
+        expected.add("2.25");
+        ArrayList<String> actual = jerksonParser.removeNullItemsFromArray(inputPrices);
+        assertEquals("Expect items equal", expected, actual);
+    }
+
+    @Test
+    public void removeItemsFromArrayTest() throws StringMismatchException {
+        ArrayList<String> inputPrices = new ArrayList<>();
+        inputPrices.add("3.23");
+        inputPrices.add("null");
+        inputPrices.add("0.23");
+        inputPrices.add("2.25");
+        ArrayList<String> expected = new ArrayList<>();
+        expected.add("3.23");
+        expected.add("0.23");
+        expected.add("2.25");
+        ArrayList<String> actual = jerksonParser.removeNullItemsFromArray(inputPrices);
+        assertEquals("Expect items equal", expected, actual);
+    }
+
+    @Test
+    public void removeItemsFromArray2Test() throws StringMismatchException {
+        ArrayList<String> iputItems = new ArrayList<>();
+        iputItems.add("M");
+        iputItems.add("B");
+        iputItems.add("c");
+        ArrayList<String> expected = new ArrayList<>();
+        expected.add("Milk");
+        expected.add("Bread");
+        expected.add("Cookies");
+        ArrayList<String> actual = jerksonParser.removeNullItemsFromArray(iputItems);
+        assertEquals("Expect items equal", expected, actual);
+    }
+
+    @Test
+    public void groceryCartTest(){
+        ArrayList<String> groceryItems = new ArrayList<>();
+        groceryItems.add("Milk");
+        groceryItems.add("Bread");
+        groceryItems.add("Cookies");
+        groceryItems.add("Milk");
+        groceryItems.add("Milk");
+
+        ArrayList<String> inputPrices = new ArrayList<>();
+        inputPrices.add("3.23");
+        inputPrices.add("0.23");
+        inputPrices.add("2.25");
+        inputPrices.add("1.25"); //consider Map.entry to get the whole entry value
+        inputPrices.add("3.23");
+
+        HashMap<String, HashMap<String, Integer>> expected = new HashMap<>();
+
+        HashMap<String, Integer> inner = new HashMap<>();
+        inner.put(inputPrices.get(0), 2);
+        inner.put(inputPrices.get(1), 1);
+        inner.put(inputPrices.get(2), 1);
+        inner.put(inputPrices.get(3), 1);
+
+
+        expected.put(groceryItems.get(0), inner);
+        HashMap<String, HashMap<String, Integer>> actual = jerksonParser.groceryCart(groceryItems, inputPrices);
+        assertEquals(expected, actual);
     }
 
     @Test
